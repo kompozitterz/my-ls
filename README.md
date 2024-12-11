@@ -10,9 +10,18 @@ Recréation de la commande Unix `ls` en Go.
     * `-r`:  Inverser l'ordre, 
     * `-t`:  Trier par date de modification.
 
-## Compilation
+## Usage 
+
+> Compilation 
+
 ```bash
 go build -o my-ls
+```
+
+> Script
+
+```bash
+./script.sh
 ```
 
 > Authors :
