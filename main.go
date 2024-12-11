@@ -10,25 +10,11 @@ import (
 	"syscall"
 )
 
-type fileInfoSlice []fs.FileInfo
-
 const (
 	resetColor   = "\033[0m"
 	dirColor     = "\033[1;34m"
 	symlinkColor = "\033[1;36m"
 )
-
-func (f fileInfoSlice) Len() int {
-	return len(f)
-}
-
-func (f fileInfoSlice) Less(i, j int) bool {
-	return f[i].Name() < f[j].Name()
-}
-
-func (f fileInfoSlice) Swap(i, j int) {
-	f[i], f[j] = f[j], f[i]
-}
 
 func getColor(file fs.FileInfo) string {
 	if file.IsDir() {
@@ -51,6 +37,12 @@ func formatPermissions(mode fs.FileMode) string {
 	return perms
 }
 
+func reverseSlice(files []fs.FileInfo) {
+	for i, j := 0, len(files)-1; i < j; i, j = i+1, j-1 {
+		files[i], files[j] = files[j], files[i]
+	}
+}
+
 func list(path string, r, l, a, rev, t bool) {
 	d, err := os.ReadDir(path)
 	if err != nil {
@@ -58,7 +50,7 @@ func list(path string, r, l, a, rev, t bool) {
 		return
 	}
 
-	var files fileInfoSlice
+	var files []fs.FileInfo
 	for _, entry := range d {
 		if !a && strings.HasPrefix(entry.Name(), ".") {
 			continue
@@ -74,13 +66,16 @@ func list(path string, r, l, a, rev, t bool) {
 	// Sorting logic
 	if t {
 		sort.Slice(files, func(i, j int) bool {
-			return files[i].ModTime().Before(files[j].ModTime())
+			return files[i].ModTime().After(files[j].ModTime())
 		})
 	} else {
-		sort.Sort(files)
+		sort.Slice(files, func(i, j int) bool {
+			return files[i].Name() < files[j].Name()
+		})
 	}
+
 	if rev {
-		sort.Sort(sort.Reverse(files))
+		reverseSlice(files)
 	}
 
 	// Display files
