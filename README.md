@@ -16,6 +16,6 @@ go build -o my-ls
 ```
 
 > Authors :
-    * kevin b  
-    * hissa
-    * melvin 
+    > kevin b  
+    > hissa
+    > melvin 
